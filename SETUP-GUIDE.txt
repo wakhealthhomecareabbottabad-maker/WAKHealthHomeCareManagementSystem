@@ -1,0 +1,58 @@
+WAK HEALTH & HOME CARE ABBOTTABAD — BUSINESS MANAGEMENT SYSTEM
+===========================================================
+Included files
+- index.html: your existing public website, with booking widget loader added.
+- admin.html: responsive business dashboard for mobile and computer.
+- supabase-config.js: browser-safe Supabase project URL + anon/public key placeholders.
+- supabase-setup.sql: tables, role-based Row Level Security policies.
+- wak-booking-widget.js: public website booking form; requests are private to authorized staff.
+
+IMPORTANT
+This is a static GitHub Pages frontend connected to Supabase. It will not work until Supabase is configured. No database credentials are included. Never put a Supabase service_role/secret key in browser files.
+
+1) SUPABASE PROJECT
+Create a project at https://supabase.com/. In Project Settings / API, copy Project URL and anon/public key. Keep database password and any service_role/secret key private.
+
+2) DATABASE
+In Supabase Dashboard > SQL Editor, run all of supabase-setup.sql. Check for any SQL error before continuing. Do not disable RLS.
+
+3) CREATE ADMIN LOGIN
+In Supabase > Authentication > Users, create your own user with email/password (turn public sign-ups OFF). Copy the user's UUID. In SQL Editor run, replacing both values:
+insert into public.wak_staff (user_id, full_name, email, role, active)
+values ('AUTH-USER-UUID-HERE', 'Waqas Ahmad Khan', 'YOUR-ADMIN-EMAIL', 'admin', true);
+Use your actual login email and exact UUID. Do not leave placeholders.
+
+4) STAFF LOGINS / PERMISSIONS
+Create each staff account in Authentication > Users, with public sign-ups OFF. Then add their profile in SQL Editor or the Staff & Access section, using that Auth user's exact UUID:
+insert into public.wak_staff (user_id, full_name, email, phone, role, active)
+values ('AUTH-USER-UUID-HERE', 'Staff Full Name', 'staff@example.com', '03xxxxxxxxx', 'receptionist', true);
+Allowed roles: admin, receptionist, nurse, physiotherapist, doctor, finance. Assign the least privilege needed. Clinicians should be assigned to their cases/appointments. Staff & Access page is admin-only; create the Auth user first in Supabase because browser code cannot safely create auth users.
+
+5) CONNECT FRONTEND
+Edit supabase-config.js and replace placeholders with your real Project URL and anon/public key only. Do NOT paste the service_role key.
+
+6) UPLOAD TO GITHUB
+In your existing repository https://github.com/waqasahmad8490-bit/wak-health-home-care-abbottabad-/ upload/replace these files at repository root:
+index.html, admin.html, supabase-config.js, wak-booking-widget.js
+Keep supabase-setup.sql and this guide in your private/local copy; there is no need to publish them. Commit changes and wait for GitHub Pages to redeploy.
+
+7) OPEN AND TEST
+Public site: https://waqasahmad8490-bit.github.io/wak-healthhome-care-abbottabad/
+Admin: https://waqasahmad8490-bit.github.io/wak-healthhome-care-abbottabad/admin.html
+Test with dummy patient/request first. Verify public visitors can submit bookings but cannot read booking requests, patients, staff, cases, or finance. Test each staff role with a separate account before using real patient information.
+
+FEATURES IN THIS STARTER
+- Patient register and contact details
+- Appointment scheduling and staff assignment
+- Nursing / physiotherapy case tracking and session counts
+- Website booking requests and WhatsApp click-to-chat reply
+- Income, expenses, staff payments and recorded net balance
+- Staff roles and permission-aware navigation
+- Notice board management, CSV exports, search and responsive layout
+
+LIMITATIONS / SAFETY
+- WhatsApp button opens a prefilled chat; it does not send automatically. Automated reminders need WhatsApp Business Platform/API and an approved setup.
+- This version does not create Supabase Auth users from the app; create them in Supabase Auth, then assign the matching role.
+- Financial reports reflect only transactions entered and are not audited accounts.
+- Avoid storing unnecessary medical details. Restrict staff access, use strong passwords, keep backups, and follow applicable privacy/health-data requirements.
+- Public booking form includes basic validation and a honeypot but is not a substitute for production anti-abuse controls. Consider rate limiting/CAPTCHA before advertising widely.
